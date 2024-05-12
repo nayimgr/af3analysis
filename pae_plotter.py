@@ -14,6 +14,61 @@ parser.add_argument('--dir', type=str, help='directory containing all json files
 args = parser.parse_args()
 directory_path = args.dir
 
+# How many additional atoms to add per PTM or ligand
+protPTMs = {"CCD_SEP":10,
+            "CCD_TPO":11,
+            "CCD_PTR":16,
+            "CCD_NEP":14,
+            "CCD_HIP":14,
+            "CCD_ALY":12,
+            "CCD_MLY":11,
+            "CCD_M3L":12,
+            "CCD_MLZ":10,
+            "CCD_2MR":13,
+            "CCD_AGM":12,
+            "CCD_MCS":12,
+            "CCD_HYP":8,
+            "CCD_HY3":8,
+            "CCD_LYZ":10,
+            "CCD_AHB":9,
+            "CCD_P1L":22,
+            "CCD_SNN":7,
+            "CCD_SNC":8,
+            "CCD_TRF":16,
+            "CCD_KCR":14,
+            "CCD_CIR":11,
+            "CCD_YHA":11}
+
+# dnaPTMs = { "CCD_5CM":
+#             "CCD_C34":
+#             "CCD_5HC":
+#             "CCD_6OG":
+#             "CCD_6MA":
+#             "CCD_1CC":
+#             "CCD_8OG":
+#             "CCD_5FC":
+#             "CCD_3DR":}
+
+ligands_dict = {"CCD_ADP":27,
+                "CCD_ATP":31,
+                "CCD_AMP":23,
+                "CCD_GTP":32,
+                "CCD_GDP":28,
+                "CCD_FAD":53,
+                "CCD_NAD":44,
+                "CCD_NAP":48,
+                "CCD_NDP":48,
+                "CCD_HEM":43,
+                "CCD_HEC":43,
+                "CCD_PLM":18,
+                "CCD_OLA":20,
+                "CCD_MYR":16,
+                "CCD_CIT":13,
+                "CCD_CLA":65,
+                "CCD_CHL":66,
+                "CCD_BCL":66,
+                "CCD_BCB":66}
+
 def get_full_data(path):
 
     job_parameters_file = glob.glob(path+"/*job_request.json")[0]
@@ -30,29 +85,7 @@ def get_full_data(path):
                 additional_atoms = 0
                 if "modifications" in sequence["proteinChain"]:
                     for ptm in sequence["proteinChain"]["modifications"]:
-                        if ptm["ptmType"] == "CCD_SEP": additional_atoms += 10
-                        elif ptm["ptmType"] == "CCD_TPO": additional_atoms += 11
-                        elif ptm["ptmType"] == "CCD_PTR": additional_atoms += 16
-                        elif ptm["ptmType"] == "CCD_NEP": additional_atoms += 14
-                        elif ptm["ptmType"] == "CCD_HIP": additional_atoms += 14
-                        elif ptm["ptmType"] == "CCD_ALY": additional_atoms += 12
-                        elif ptm["ptmType"] == "CCD_MLY": additional_atoms += 11
-                        elif ptm["ptmType"] == "CCD_M3L": additional_atoms += 12
-                        elif ptm["ptmType"] == "CCD_MLZ": additional_atoms += 10
-                        elif ptm["ptmType"] == "CCD_2MR": additional_atoms += 13
-                        elif ptm["ptmType"] == "CCD_AGM": additional_atoms += 12
-                        elif ptm["ptmType"] == "CCD_MCS": additional_atoms += 12
-                        elif ptm["ptmType"] == "CCD_HYP": additional_atoms += 8
-                        elif ptm["ptmType"] == "CCD_HY3": additional_atoms += 8
-                        elif ptm["ptmType"] == "CCD_LYZ": additional_atoms += 10
-                        elif ptm["ptmType"] == "CCD_AHB": additional_atoms += 9
-                        elif ptm["ptmType"] == "CCD_P1L": additional_atoms += 22
-                        elif ptm["ptmType"] == "CCD_SNN": additional_atoms += 7
-                        elif ptm["ptmType"] == "CCD_SNC": additional_atoms += 8
-                        elif ptm["ptmType"] == "CCD_TRF": additional_atoms += 16
-                        elif ptm["ptmType"] == "CCD_KCR": additional_atoms += 14
-                        elif ptm["ptmType"] == "CCD_CIR": additional_atoms += 11
-                        elif ptm["ptmType"] == "CCD_YHA": additional_atoms += 11
+                        additional_atoms += protPTMs[ptm["ptmType"]]
 
                 chain_lengths.append(len(sequence['proteinChain']['sequence'])+additional_atoms)
         elif "dnaSequence" in sequence:
@@ -68,26 +101,8 @@ def get_full_data(path):
         elif "ligand" in sequence:
             # Number of atoms in each ligand
             for n in range(int(sequence['ligand']['count'])):
-                if sequence['ligand']['ligand'] == "CCD_ADP": chain_lengths.append(27)
-                elif sequence['ligand']['ligand'] == "CCD_ATP": chain_lengths.append(31)
-                elif sequence['ligand']['ligand'] == "CCD_AMP": chain_lengths.append(23)
-                elif sequence['ligand']['ligand'] == "CCD_GTP": chain_lengths.append(32)
-                elif sequence['ligand']['ligand'] == "CCD_GDP": chain_lengths.append(28)
-                elif sequence['ligand']['ligand'] == "CCD_FAD": chain_lengths.append(53)
-                elif sequence['ligand']['ligand'] == "CCD_NAD": chain_lengths.append(44)
-                elif sequence['ligand']['ligand'] == "CCD_NAP": chain_lengths.append(48)
-                elif sequence['ligand']['ligand'] == "CCD_NDP": chain_lengths.append(48)
-                elif sequence['ligand']['ligand'] == "CCD_HEM": chain_lengths.append(43)
-                elif sequence['ligand']['ligand'] == "CCD_HEC": chain_lengths.append(43)
-                elif sequence['ligand']['ligand'] == "CCD_PLM": chain_lengths.append(18)
-                elif sequence['ligand']['ligand'] == "CCD_OLA": chain_lengths.append(20)
-                elif sequence['ligand']['ligand'] == "CCD_MYR": chain_lengths.append(16)
-                elif sequence['ligand']['ligand'] == "CCD_CIT": chain_lengths.append(13)
-                elif sequence['ligand']['ligand'] == "CCD_CLA": chain_lengths.append(65)
-                elif sequence['ligand']['ligand'] == "CCD_CHL": chain_lengths.append(66)
-                elif sequence['ligand']['ligand'] == "CCD_BCL": chain_lengths.append(66)
-                elif sequence['ligand']['ligand'] == "CCD_BCB": chain_lengths.append(66)
-                else: print("Could not recognize ligand "+str(sequence))
+                try: chain_lengths.append(ligands_dict[sequence['ligand']['ligand']])
+                except: print("Could not recognize ligand "+str(sequence))
         else: print("There is a molecule I cannot recognize: "+str(sequence))
 
     file_list = sorted(glob.glob(path+"/*full_data_?.json"))
