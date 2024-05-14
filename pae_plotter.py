@@ -149,7 +149,52 @@ def plot_pae(data):
 
     plt.savefig(data[2]+"_pae.png", dpi=300.0)
 
+def plot_plddt(data, window_size=8):
+    
+    name = data[2]+" model "
+    proteins_lengths = data[1]
+    num_models = len(data[0])
+    total_length = sum(proteins_lengths)
+    n_model = "0"
+    chains, chain_lengths = np.unique(data[0][0]["atom_chain_ids"], return_counts=True)
+
+    palette = plt.cm.get_cmap("viridis")
+    palette = [palette(a / (len(proteins_lengths) - 1)) for a in range(len(proteins_lengths))] # Adapting to discrete palette
+    prev_chain_length = 0
+
+    fig, axes = plt.subplots(figsize=(24, 6))
+
+    for i, model in enumerate(data[0]):
+        plddt_array = np.array(model["atom_plddts"])
+        smoothed_plddt = np.convolve(plddt_array, np.ones(window_size)/window_size, mode='valid')
+        label = name+n_model
+        axes.plot(smoothed_plddt, label=label, color=palette[i])
+        axes.set_xticks([])
+        axes.set_ylabel("plddt") 
+        
+
+        n_model = str(int(n_model)+1)
+        prev_chain_length += chain_lengths
+
+    length = 0
+    for i in range(len(chain_lengths)):
+        # axes.text(length + chain_lengths[i] / 2, np.argmin(plddt_array)*0.9, chains[i], ha='center', va='center', color='black')
+        length += chain_lengths[i]
+        axes.axvline(x=length, color='black', linestyle='--', linewidth=2)
+
+    
+    plt.savefig(data[2]+"_plddt.png", dpi=300.0)
+        
+
+
+
+
+
+
+
+
 
 data = get_full_data(directory_path)
 plot_pae(data)
+plot_plddt(data)
 
