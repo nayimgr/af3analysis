@@ -131,7 +131,7 @@ def plot_pae(data):
         axes[i].set_aspect('equal', adjustable='box')
         previous_l = 0
         palette = plt.cm.get_cmap("viridis")
-        palette = [palette(a / (len(proteins_lengths) - 1)) for a in range(len(proteins_lengths))] # Adapting to discrete palette
+        palette = [palette(a / (len(proteins_lengths) - 1 if len(proteins_lengths) > 1 else 1)) for a in range(len(proteins_lengths))]  # Fixing division by zero
         chain_ids = list(string.ascii_uppercase[:len(proteins_lengths)])
         chain_number = 0
 
@@ -159,7 +159,7 @@ def plot_plddt(data, window_size=8):
     chains, chain_lengths = np.unique(data[0][0]["atom_chain_ids"], return_counts=True)
 
     palette = plt.cm.get_cmap("viridis")
-    palette = [palette(a / (len(proteins_lengths) - 1)) for a in range(len(proteins_lengths))] # Adapting to discrete palette
+    palette = [palette(a / (len(proteins_lengths) - 1 if len(proteins_lengths) > 1 else 1)) for a in range(len(proteins_lengths))]  # Fixing division by zero
     prev_chain_length = 0
 
     fig, axes = plt.subplots(figsize=(24, 6))
@@ -168,7 +168,7 @@ def plot_plddt(data, window_size=8):
         plddt_array = np.array(model["atom_plddts"])
         smoothed_plddt = np.convolve(plddt_array, np.ones(window_size)/window_size, mode='valid')
         label = name+n_model
-        axes.plot(smoothed_plddt, label=label, color=palette[i])
+        axes.plot(smoothed_plddt, label=label, color=palette[i % len(palette)])  # Using modulo to avoid index errors
         axes.set_xticks([])
         axes.set_ylabel("plddt") 
         
@@ -185,16 +185,10 @@ def plot_plddt(data, window_size=8):
     
     plt.savefig(data[2]+"_plddt.png", dpi=300.0)
         
-
-
-
-
-
-
-
-
-
+print("starting")
 data = get_full_data(directory_path)
+print("data loaded")
 plot_pae(data)
+print("pae")
 plot_plddt(data)
-
+print("plddt")
