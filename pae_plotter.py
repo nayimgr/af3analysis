@@ -11,8 +11,11 @@ import argparse
 # Parse input
 parser = argparse.ArgumentParser(description='Script for plotting pae from all models from AF3 server')
 parser.add_argument('--dir', type=str, help='directory containing all json files', default="." )
+parser.add_argument('--palette', type=str, help='color scheme for the plot', default="viridis")
 args = parser.parse_args()
 directory_path = args.dir
+color_scheme = args.palette
+
 
 # How many additional atoms to add per PTM or ligand
 protPTMs = {"CCD_SEP":10,
@@ -126,11 +129,12 @@ def plot_pae(data):
 
     for i, model in enumerate(data[0]):
         pae_matrix = np.array(model['pae'])
-        sns.heatmap(pae_matrix, cmap='viridis', ax=axes[i], square=True, cbar=True, xticklabels=False, yticklabels=False, cbar_kws={"shrink":0.2})
+        sns.heatmap(pae_matrix, cmap=color_scheme, ax=axes[i], square=True, cbar=True, xticklabels=False, yticklabels=False, cbar_kws={"shrink":0.2})
+
         axes[i].set_title(name+n_model, y=1.05)
         axes[i].set_aspect('equal', adjustable='box')
         previous_l = 0
-        palette = plt.cm.get_cmap("viridis")
+        palette = plt.cm.get_cmap(color_scheme)
         palette = [palette(a / (len(proteins_lengths) - 1 if len(proteins_lengths) > 1 else 1)) for a in range(len(proteins_lengths))]  # Fixing division by zero
         chain_ids = list(string.ascii_uppercase[:len(proteins_lengths)])
         chain_number = 0
@@ -158,7 +162,7 @@ def plot_plddt(data, window_size=8):
     n_model = "0"
     chains, chain_lengths = np.unique(data[0][0]["atom_chain_ids"], return_counts=True)
 
-    palette = plt.cm.get_cmap("viridis")
+    palette = plt.cm.get_cmap(color_scheme)
     palette = [palette(a / (len(proteins_lengths) - 1 if len(proteins_lengths) > 1 else 1)) for a in range(len(proteins_lengths))]  # Fixing division by zero
     prev_chain_length = 0
 
