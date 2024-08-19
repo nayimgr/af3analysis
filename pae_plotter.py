@@ -11,7 +11,7 @@ import argparse
 # Parse input
 parser = argparse.ArgumentParser(description='Script for plotting pae from all models from AF3 server')
 parser.add_argument('--dir', type=str, help='directory containing all json files', default="." )
-parser.add_argument('--palette', type=str, help='color scheme for the plot', default="viridis")
+parser.add_argument('--palette', type=str, help='color scheme for the plot', default="bwr")
 args = parser.parse_args()
 directory_path = args.dir
 color_scheme = args.palette
