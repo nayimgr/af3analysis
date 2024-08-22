@@ -1,9 +1,6 @@
-import pandas as pd
 import json
 import numpy as np
-import seaborn as sns
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
 import glob
 import string
 import argparse
@@ -124,33 +121,33 @@ def plot_pae(data):
     num_models = len(data[0])
     total_length = sum(proteins_lengths)
     n_model = "0"
+    n = 0
 
-    fig, axes = plt.subplots(1, num_models, figsize=(8*num_models, 6))
+    fig, axes = plt.subplots(nrows=1, ncols=num_models, figsize=(6*num_models, 5))
 
     for i, model in enumerate(data[0]):
         pae_matrix = np.array(model['pae'])
-        sns.heatmap(pae_matrix, cmap=color_scheme, ax=axes[i], square=True, cbar=True, xticklabels=False, yticklabels=False, cbar_kws={"shrink":0.2})
-
+        im = axes[i].imshow(pae_matrix, cmap=color_scheme, vmin=0, vmax=30)
         axes[i].set_title(name+n_model, y=1.05)
-        axes[i].set_aspect('equal', adjustable='box')
         previous_l = 0
         palette = plt.cm.get_cmap(color_scheme)
         palette = [palette(a / (len(proteins_lengths) - 1 if len(proteins_lengths) > 1 else 1)) for a in range(len(proteins_lengths))]  # Fixing division by zero
         chain_ids = list(string.ascii_uppercase[:len(proteins_lengths)])
         chain_number = 0
 
-        for length in proteins_lengths:
-            rect_x = patches.Rectangle((previous_l, 0), length, -0.03*total_length, linewidth=1, edgecolor='none', facecolor=palette[chain_number], clip_on=False)
-            rect_y = patches.Rectangle((total_length, previous_l), 0.03*total_length, length, linewidth=1, edgecolor='none',facecolor=palette[chain_number], clip_on=False)
-            axes[i].add_patch(rect_x)
-            axes[i].add_patch(rect_y)
+        for length in proteins_lengths[:-1]: # trimming list to avoid painting the last line
+            axes[i].axvline(previous_l+length, color="black", linewidth=1.5)
+            axes[i].axhline(previous_l+length, color="black", linewidth=1.5)
             axes[i].text(previous_l + length / 2, -0.015*total_length, chain_ids[chain_number], ha='center', va='center', color='black')
             axes[i].text(1.015*total_length, previous_l + length / 2, chain_ids[chain_number], ha='center', va='center', color='black')
             previous_l += length
             chain_number += 1
 
         n_model = str(int(n_model)+1)
-
+    
+    cax = fig.add_axes([axes[-1].get_position().x1+0.012, axes[-1].get_position().y0, 0.01, axes[-1].get_position().height])
+    fig.colorbar(im, cax=cax)
+    plt.subplots_adjust(wspace=0.06)
     plt.savefig(data[2]+"_pae.png", dpi=300.0)
 
 def plot_plddt(data, window_size=8):
