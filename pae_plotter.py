@@ -148,6 +148,7 @@ def plot_pae(data):
     cax = fig.add_axes([axes[-1].get_position().x1+0.012, axes[-1].get_position().y0, 0.01, axes[-1].get_position().height])
     fig.colorbar(im, cax=cax)
     plt.subplots_adjust(wspace=0.06)
+    plt.savefig(data[2]+"_pae.svg", dpi=300.0)
     plt.savefig(data[2]+"_pae.png", dpi=300.0)
 
 def plot_plddt(data, window_size=8):
@@ -185,6 +186,7 @@ def plot_plddt(data, window_size=8):
 
     
     plt.savefig(data[2]+"_plddt.png", dpi=300.0)
+    plt.savefig(data[2]+"_plddt.svg", dpi=300.0)
         
 print("starting")
 data = get_full_data(directory_path)
